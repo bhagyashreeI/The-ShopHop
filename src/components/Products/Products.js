@@ -3,6 +3,7 @@ import Product from '../Product/Product';
 import {APIURL} from '../../constants/global';
 //import Categories from '../Categories/Categories';
 import {useParams} from 'react-router-dom';
+import Loader from '../../container/Loader/Loader';
 
 export default function Products (props) {
   let productjewelryurl = APIURL + '/products/category/';
@@ -13,7 +14,9 @@ export default function Products (props) {
   const [prodcount, setProdCount] = useState (0);
   const [products, setProducts] = useState ();
 
-  let category = 'jewelery';
+  let fullyloaded = false;
+
+  let category = '';
 
   const fetchCategories = () => {
     fetch ('https://fakestoreapi.com/products/categories')
@@ -22,28 +25,31 @@ export default function Products (props) {
         setCatList (data);
         category = data[0];
         setActiveCat (0);
-        fetchJewelery ();
+        fetchProducts ();
       })
       .catch (err => console.log (err));
   };
 
   useEffect (() => {
     fetchCategories ();
-    fetchJewelery ();
+    fetchProducts ();
   }, []);
 
   const handleCategoryClick = (ev, cidex) => {
+    setProdCount (0);
+
     category = ev;
     setActiveCat (cidex);
-    fetchJewelery ();
+    fetchProducts ();
   };
 
-  const fetchJewelery = () => {
+  const fetchProducts = () => {
     fetch (productjewelryurl + category)
       .then (res => res.json ())
       .then (data => {
         setProducts (data);
         setProdCount (data.length);
+        fullyloaded = true;
       })
       .catch (err => console.log (err));
   };
@@ -68,9 +74,15 @@ export default function Products (props) {
         </ul>
       </div>
       <div className="col-md-8">
+
         <h1>Products ({prodcount}) </h1>
+        <div>
+          {prodcount == 0 && <Loader />}
+        </div>
+
         <div className="row">
           {products &&
+            prodcount > 0 &&
             products.map (item => {
               const {id, imageUrl} = item;
               return (
