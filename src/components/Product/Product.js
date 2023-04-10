@@ -3,7 +3,7 @@ import {FaRegHeart} from 'react-icons/fa';
 
 import {BsCartPlus} from 'react-icons/bs';
 
-export default function Product({title,description,picture,price,rating}) {
+export default function Product({title,description,picture,price,instock}) {
   const style = {marginLeft: '10px', fontSize: '1.5em'};
 
   return (
@@ -17,7 +17,7 @@ export default function Product({title,description,picture,price,rating}) {
   </div>
   <ul className="list-group list-group-flush">
     <li className="list-group-item">Price: {price}</li>
-    <li className="list-group-item" >Rating: {rating.rate} ({rating.count})</li>
+    {!instock && <li className="list-group-item" ><span className="text-danger">Out of stock</span></li>}
   </ul>
   <div className="card-body">
     <BsCartPlus title='Add to Cart' style = {style}/>

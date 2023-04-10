@@ -6,7 +6,8 @@ import {useParams} from 'react-router-dom';
 import Loader from '../../container/Loader/Loader';
 
 export default function Products (props) {
-  let productjewelryurl = APIURL + '/products/category/';
+  //let productjewelryurl = APIURL + '/products/category/';
+  let producturl = APIURL + '/products/';
 
   const [catlist, setCatList] = useState ();
   const [activecat, setActiveCat] = useState ();
@@ -19,12 +20,12 @@ export default function Products (props) {
   let category = '';
 
   const fetchCategories = () => {
-    fetch ('https://fakestoreapi.com/products/categories')
+    fetch (APIURL+'/categories')
       .then (res => res.json ())
       .then (data => {
-        setCatList (data);
-        category = data[0];
-        setActiveCat (0);
+        setCatList (data.Categories);
+        category = data.Categories[0]['id'];
+        setActiveCat (category);
         fetchProducts ();
       })
       .catch (err => console.log (err));
@@ -35,20 +36,20 @@ export default function Products (props) {
     fetchProducts ();
   }, []);
 
-  const handleCategoryClick = (ev, cidex) => {
+  const handleCategoryClick = (ev) => {
     setProdCount (0);
 
     category = ev;
-    setActiveCat (cidex);
+    setActiveCat (ev);
     fetchProducts ();
   };
 
   const fetchProducts = () => {
-    fetch (productjewelryurl + category)
+    fetch (producturl+category)
       .then (res => res.json ())
       .then (data => {
-        setProducts (data);
-        setProdCount (data.length);
+        setProducts (data.Products);
+        setProdCount (data.Products.length);
         fullyloaded = true;
       })
       .catch (err => console.log (err));
@@ -63,11 +64,11 @@ export default function Products (props) {
             catlist.map ((item, inx) => {
               return (
                 <li
-                  className={`list-group-item text-capitalize ${activecat === inx ? 'active' : ''}`}
+                  className={`list-group-item text-capitalize ${activecat === item.id ? 'active' : ''}`}
                   key={inx}
-                  onClick={() => handleCategoryClick (item, inx)}
+                  onClick={() => handleCategoryClick (item.id)}
                 >
-                  {item}
+                  {item.name}
                 </li>
               );
             })}
@@ -88,11 +89,11 @@ export default function Products (props) {
               return (
                 <div key={id} className="col-sm-4">
                   <Product
-                    title={item.title}
+                    title={item.Name}
                     description={item.description}
-                    picture={item.image}
                     price={item.price}
-                    rating={item.rating}
+                    instock={item.InStock}
+                    picture={item.image}
                     key={id}
                   />
                 </div>
