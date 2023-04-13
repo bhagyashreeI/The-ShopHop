@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -6,12 +6,15 @@ import {APIURL} from '../../constants/global';
 
 export default function Login (props) {
   let loginurl = APIURL + '/auth/login';
+  const user_token = localStorage.getItem("auth_token");
 
   const [show, setShow] = useState (false);
   const [inputValues, setLogin] = useState ({
     isLogin:false,
     email:'',
-    password:''
+    password:'',
+    error_list:[],
+    warningmsg:''
   });
 
   const handleClose = () => setShow (false);
@@ -22,31 +25,31 @@ export default function Login (props) {
   }
 
   const handleLogin = (e) => {
-   // setShow (false);
-   // return false;
    e.preventDefault();
-    let formdata = new FormData();
-    formdata.append("email", inputValues.email);
-    formdata.append("password", inputValues.password);
-    formdata.append("remember_me", "0");
 
     let requestOptions = {
       method: 'POST',
-      body: formdata,
-      redirect: 'follow'
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: inputValues.email,password:inputValues.password,remember_me:0 })
     };
     fetch (loginurl,requestOptions)
-      .then (res => {
-        console.log ('res22', res.status);
-        if(res.status == 200){
-          let logindata = res.json;
-          localStorage.setItem("auth_token",logindata.access_token);
-          setLogin({...inputValues, isLogin: true})
-          setShow (false);
-        }else{
-          alert("Invalid credentials");
-          return false;
-        }
+      .then (async res => {
+        console.log("resp",await res.status)
+          const resp = await res.json();
+          console.log("resp",resp)
+          let api_status = resp.status;
+          console.log("api_status",api_status)
+          if(api_status === 200){
+            localStorage.setItem("auth_token",resp.access_token);
+            setLogin({...inputValues, isLogin: true,error_list:[],warningmsg:''})
+            setShow (false);
+          }else if(api_status === 401){
+            setLogin({...inputValues,warningmsg:resp.message,error_list:[]})
+          }else{
+            setLogin({...inputValues,error_list:resp.errors,warningmsg:''})
+          }
+         
+        
       })
       
       .catch (err => console.log ('err', err));
@@ -54,7 +57,7 @@ export default function Login (props) {
 
   return (
     <div>
-      {!inputValues.isLogin && <button
+      {user_token == null && <button
         type="button"
         className="btn btn-outline-success my-2 my-sm-0 float-right"
         data-toggle="modal"
@@ -62,6 +65,13 @@ export default function Login (props) {
         onClick={handleShow}
       >
         Login
+      </button>}
+      {user_token != null && <button
+        type="button"
+        className="btn btn-outline-primary my-2 my-sm-0 float-right"
+       
+      >
+        Logout
       </button>}
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -71,12 +81,15 @@ export default function Login (props) {
           <Form onSubmit={handleLogin}>
             <Form.Group className="mb-3">
               <Form.Label>Email address</Form.Label>
-              <Form.Control type="email" name="email" onChange={handleInput} value={inputValues.email} placeholder="name@example.com" />
+              <Form.Control type="text" name="email" onChange={handleInput} value={inputValues.email} placeholder="name@example.com" />
+              <span className="text-danger" >{inputValues.error_list.email}</span>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Password</Form.Label>
               <Form.Control type="password" name="password" onChange={handleInput} value={inputValues.password} placeholder="*****" />
+              <span className="text-danger">{inputValues.error_list.password}</span>
             </Form.Group>
+            <span className="text-danger text-center p-2 m-2 ">{inputValues.warningmsg}</span>
             <Button type="submit" variant="primary">
             Login
           </Button>
