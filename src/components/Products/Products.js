@@ -7,7 +7,7 @@ import Loader from '../../container/Loader/Loader';
 
 export default function Products (props) {
   //let productjewelryurl = APIURL + '/products/category/';
-  let producturl = APIURL + '/products/';
+  let producturl = APIURL + '/productsbycategory/';
 
   const [catlist, setCatList] = useState ();
   const [activecat, setActiveCat] = useState ();
