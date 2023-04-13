@@ -6,7 +6,7 @@ import {APIURL} from '../../constants/global';
 
 export default function Login (props) {
   let loginurl = APIURL + '/auth/login';
-  const user_token = localStorage.getItem("auth_token");
+  let user_token = localStorage.getItem("auth_token");
 
   const [show, setShow] = useState (false);
   const [inputValues, setLogin] = useState ({
@@ -55,6 +55,20 @@ export default function Login (props) {
       .catch (err => console.log ('err', err));
   };
 
+  const handleLogout = (e) => {
+    e.preventDefault();
+    
+     let requestOptions = {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json',"Authorization" : `Bearer ${user_token}` }
+    };
+    fetch(APIURL+"/auth/logout",requestOptions).then(res => {
+      localStorage.removeItem('auth_token');
+      user_token = localStorage.getItem('auth_token');
+      setLogin({...inputValues,isLogin:false})
+    }).catch (err => console.log ('err', err));
+  }
+
   return (
     <div>
       {user_token == null && <button
@@ -68,6 +82,7 @@ export default function Login (props) {
       </button>}
       {user_token != null && <button
         type="button"
+        onClick={handleLogout}
         className="btn btn-outline-primary my-2 my-sm-0 float-right"
        
       >
