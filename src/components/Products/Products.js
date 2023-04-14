@@ -8,6 +8,7 @@ import Loader from '../../container/Loader/Loader';
 export default function Products (props) {
   //let productjewelryurl = APIURL + '/products/category/';
   let producturl = APIURL + '/productsbycategory/';
+  let user_token = localStorage.getItem("auth_token");
 
   const [catlist, setCatList] = useState ();
   const [activecat, setActiveCat] = useState ();
@@ -76,6 +77,8 @@ export default function Products (props) {
                     instock={item.InStock}
                     picture={item.image}
                     key={id}
+                    usertoken={user_token}
+                    pid={id}
                   />
                 </div>
               );
