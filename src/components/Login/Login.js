@@ -3,8 +3,9 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import {APIURL} from '../../constants/global';
+import AuthCheck from '../../Services/AuthCheck';
 
-export default function Login (props) {
+export default function Login ({ setToken }) {
   let loginurl = APIURL + '/auth/login';
   let user_token = localStorage.getItem("auth_token");
 
@@ -27,6 +28,7 @@ export default function Login (props) {
   const handleLogin = (e) => {
    e.preventDefault();
 
+
     let requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -41,6 +43,7 @@ export default function Login (props) {
           console.log("api_status",api_status)
           if(api_status === 200){
             localStorage.setItem("auth_token",resp.access_token);
+            setToken(resp.access_token);
             setLogin({...inputValues, isLogin: true,error_list:[],warningmsg:''})
             setShow (false);
           }else if(api_status === 401){
@@ -65,6 +68,7 @@ export default function Login (props) {
     fetch(APIURL+"/auth/logout",requestOptions).then(res => {
       localStorage.removeItem('auth_token');
       user_token = localStorage.getItem('auth_token');
+      setToken(null);
       setLogin({...inputValues,isLogin:false})
     }).catch (err => console.log ('err', err));
   }
