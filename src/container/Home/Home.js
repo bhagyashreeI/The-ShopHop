@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {AiTwotoneStar} from 'react-icons/ai';
+import useAuthCheck from './../../useAuthCheck'
 
 export default function Home () {
   return (

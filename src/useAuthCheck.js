@@ -2,23 +2,26 @@ import React,{ useState,useEffect } from "react";
 
 function useAuthCheck(utoken) {
     const [isOnline, setIsOnline] = useState(null);
-    const setUtoken  = () => {
-        localStorage.setItem('auth_token',utoken)
+    const setUToken = (utoken) => {
+        if(utoken){
+            localStorage.setItem('auth_token', utoken)
+        }
+        
     }
-
-
 
     const getUToken = () => {
-        return "aaaaaaa";
-      // return localStorage.getItem('auth_token')
+        return localStorage.getItem('auth_token');
+    }
+
+    const removeUToken = () => {
+        return localStorage.removeItem('auth_token');
     }
     useEffect(() => {
-        
         getUToken();
         
     },[]);
 
-    return getUToken;
+    return ({ getUToken, setUToken, removeUToken })
 }
 
 export default useAuthCheck;

@@ -10,6 +10,8 @@ export default function Products (props) {
   let producturl = APIURL + '/productsbycategory/';
   let user_token = localStorage.getItem("auth_token");
 
+  //alert(user_token)
+
   const [catlist, setCatList] = useState ();
   const [activecat, setActiveCat] = useState ();
 

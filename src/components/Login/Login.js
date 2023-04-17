@@ -4,20 +4,53 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import {APIURL} from '../../constants/global';
 import AuthCheck from '../../Services/AuthCheck';
-import useAuthCheck, {userAuthCheck} from './../../useAuthCheck'
+import useAuthCheck from './../../useAuthCheck'
 
 export default function Login ({ setToken }) {
   let loginurl = APIURL + '/auth/login';
-  let user_token = localStorage.getItem("auth_token");
+  const { setUToken, getUToken, removeUToken } = useAuthCheck();
+  //let user_token = localStorage.getItem("auth_token");
+  let user_token = getUToken();
+  let isLogin = false;
+  if(user_token == null){
+    isLogin = false
+  }else{
+    isLogin = true;
+  }
+
+  console.log('====================================');
+  console.log("ss user_token ", user_token);
+  console.log('====================================');
+  
 
   const [show, setShow] = useState (false);
   const [inputValues, setLogin] = useState ({
-    isLogin:false,
+    isLogin: isLogin,
     email:'',
     password:'',
     error_list:[],
-    warningmsg:''
+    warningmsg:'',
+    utoken:null,
+    hitlogout:false
   });
+
+
+  useEffect(() => {
+    
+    console.log("changes")
+    console.log('====================================');
+    console.log(inputValues.utoken);
+    console.log('====================================');
+    if (user_token == null){
+      setUToken(inputValues.utoken)
+    }
+    if (inputValues.hitlogout == true) {
+      removeUToken()
+    }
+
+    
+    
+  }, [inputValues.utoken, inputValues.isLogin, inputValues.hitlogout])
 
   const handleClose = () => setShow (false);
   const handleShow = () => setShow (true);
@@ -43,9 +76,8 @@ export default function Login ({ setToken }) {
           let api_status = resp.status;
           console.log("api_status",api_status)
           if(api_status === 200){
-            localStorage.setItem("auth_token",resp.access_token);
             setToken(resp.access_token);
-            setLogin({...inputValues, isLogin: true,error_list:[],warningmsg:''})
+            setLogin({ ...inputValues, isLogin: true, error_list: [], warningmsg: '', utoken: resp.access_token })
             setShow (false);
           }else if(api_status === 401){
             setLogin({...inputValues,warningmsg:resp.message,error_list:[]})
@@ -59,6 +91,8 @@ export default function Login ({ setToken }) {
       .catch (err => console.log ('err', err));
   };
 
+  
+
   const handleLogout = (e) => {
     e.preventDefault();
     let requestOptions = {
@@ -66,17 +100,16 @@ export default function Login ({ setToken }) {
       headers: { 'Content-Type': 'application/json',"Authorization" : `Bearer ${user_token}` }
     };
     fetch(APIURL+"/auth/logout",requestOptions).then(res => {
-      localStorage.removeItem('auth_token');
-      user_token = localStorage.getItem('auth_token');
+      //localStorage.removeItem('auth_token');
       setToken(null);
-      setLogin({...inputValues,isLogin:false})
+      setLogin({ ...inputValues,utoken:null, isLogin: false, hitlogout:true})
       
     }).catch (err => console.log ('err', err));
   }
 
   return (
-    <div>
-      {user_token == null && <button
+    <div> 
+      {!inputValues.utoken && <button
         type="button"
         className="btn btn-outline-success my-2 my-sm-0 float-right"
         data-toggle="modal"
@@ -85,7 +118,7 @@ export default function Login ({ setToken }) {
       >
         Login
       </button>}
-      {user_token != null && <button
+      {inputValues.utoken  && <button
         type="button"
         onClick={handleLogout}
         className="btn btn-outline-primary my-2 my-sm-0 float-right"

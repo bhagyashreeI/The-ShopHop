@@ -9,7 +9,7 @@ export default function Cart() {
     const {getUToken} = useAuthCheck();
 
     console.log('====================================');
-    console.log("sdfsfsd", getUToken);
+    console.log("my cart", getUToken());
     console.log('====================================');
 
     const fetchCart = () => {
