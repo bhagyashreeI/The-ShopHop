@@ -3,7 +3,7 @@ import {AiTwotoneStar} from 'react-icons/ai';
 
 export default function Home () {
   return (
-    <div>
+    <div className='pt-2'>
       <h1>
         Beautiful, Masterful design, <AiTwotoneStar /> never goes out of fashion
       </h1>

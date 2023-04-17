@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import {APIURL} from '../../constants/global';
 import AuthCheck from '../../Services/AuthCheck';
+import useAuthCheck, {userAuthCheck} from './../../useAuthCheck'
 
 export default function Login ({ setToken }) {
   let loginurl = APIURL + '/auth/login';
@@ -60,8 +61,7 @@ export default function Login ({ setToken }) {
 
   const handleLogout = (e) => {
     e.preventDefault();
-    
-     let requestOptions = {
+    let requestOptions = {
       method: 'GET',
       headers: { 'Content-Type': 'application/json',"Authorization" : `Bearer ${user_token}` }
     };
@@ -70,6 +70,7 @@ export default function Login ({ setToken }) {
       user_token = localStorage.getItem('auth_token');
       setToken(null);
       setLogin({...inputValues,isLogin:false})
+      
     }).catch (err => console.log ('err', err));
   }
 

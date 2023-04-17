@@ -18,7 +18,7 @@ const ProtectedRoute = (props) => {
 
     useEffect(() => {
         checkLoginToken();
-    },[isLoggedIn])
+    }, [localStorage.getItem('auth_token')])
 
     return(
         <React.Fragment>

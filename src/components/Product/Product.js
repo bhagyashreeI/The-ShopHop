@@ -8,7 +8,7 @@ export default function Product({title,description,picture,price,instock,usertok
   const style = {marginLeft: '10px', fontSize: '1.5em'};
 
   
-  const setCart = () => {
+  const setCart = (pid) => {
     let requestoptions = {
         method:'POST',
         headers: { 'Content-Type': 'application/json',"Authorization" : `Bearer ${usertoken}` },
@@ -17,7 +17,9 @@ export default function Product({title,description,picture,price,instock,usertok
       fetch(APIURL+'/create-cart',requestoptions).then(async res=>{
         let resdata = await res.json();
         localStorage.setItem('cartKey',resdata.cartKey);
-        localStorage.setItem('cartToken',resdata.cartToken)
+        localStorage.setItem('cartToken',resdata.cartToken);
+        localStorage.setItem('cartId', resdata.cartToken);
+        addProductToCart(pid);
       }).catch(err=>{console.log("setCart err",err)})
   }
   const getCart = () => {
@@ -50,11 +52,15 @@ export default function Product({title,description,picture,price,instock,usertok
       
     }else{
       alert("fdfd")
-      getCart();
+      
       if(localStorage.getItem('cartId') === null){
-        setCart();
+        setCart(ev);
+        
+      }else{
+        getCart();
+        addProductToCart(ev);
       }
-      addProductToCart(ev);
+      
       
       
     }

@@ -50,7 +50,7 @@ export default function Products (props) {
   };
 
   return (
-    <div className="row mt-2">
+    <div className="row mt-2 pt-2">
       <div className="col-md-4">
         <h1>Categories</h1>
         <Categories categories={catlist} filterproducts={handleCategoryClick} activecatid={activecat}></Categories>
